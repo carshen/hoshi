@@ -1,0 +1,16 @@
+#postentry {
+	padding: 1.5%;
+	border-style: dotted;
+	border-width: 1px;
+	width: 42%;
+}
+textarea {
+	resize: none;
+}
+
+#history{
+	padding: 1.5%;
+	border-style: dotted;
+	border-width: 1px;
+	width: 42%;
+}

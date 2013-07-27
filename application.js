@@ -1,0 +1,16 @@
+$(document).ready(function(){
+	$('#postentry').hide();
+	$('#entry').click(function(){
+		$('#postentry').toggle(250);
+		$('p#recorded').remove();
+		$('#deletenotice').remove();
+		$('#history').hide();
+	});
+	$('#history').hide();
+	$('a#posthistory').click(function(){
+		$('#history').toggle(250);
+		$('p#recorded').remove();
+		$('#deletenotice').remove();
+		$('#postentry').hide();
+	});
+});
