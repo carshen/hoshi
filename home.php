@@ -34,11 +34,8 @@
 		$datetime = new DateTime();
 		$date = $datetime->format('y-m-d h:i:s');
 
-		$username = $_SERVER['PHP_AUTH_USER'];
-		$password = $_SERVER['PHP_AUTH_PW'];
-		
-		$query = "INSERT INTO entries (userid, username, password, title, entry, date) ".
-		"VALUES (100, '$username', '$password', '$title', '$entry', '$date')";
+		$query = "INSERT INTO entries (userid, username, title, entry, date) ".
+		"VALUES (100, '$li_username', '$title', '$entry', '$date')";
 		mysqli_query($dbc, $query)
 		or die('Error querying database.');
 		echo "<br><p id='recorded'>Your entry has been recorded.</p>";
@@ -51,7 +48,7 @@
 		echo "<p id='deletenotice'>The entry has been deleted.</p>";
 	}
 	// query for the posts in history
-	$data = mysqli_query($dbc, "SELECT * FROM entries")
+	$data = mysqli_query($dbc, "SELECT * FROM entries WHERE username='$li_username'")
 	or die('Failed to get past posts from database.');
 	
 	// display past posts in #history panel
