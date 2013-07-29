@@ -21,13 +21,33 @@
 	<textarea rows="8" cols="80" name="entry" ></textarea><br>
 	<input type="submit" value="Publish" id="submit" name="submit"/>
 </form>
-
-
+<br><p>friends</p>
+<ul>
 <?php
 	//connect, query and close the database
 	$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
 	or die('Error connecting to MySQL server.');
-		
+	
+	$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$li_username'")
+	or die('Failed to get past posts from database.');
+	while ($friends_row = mysqli_fetch_array($friend2_data)){
+		$friend = $friends_row['friend2'];
+		echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
+	}
+	
+	$friend1_data = mysqli_query($dbc, "SELECT friend1 FROM friends WHERE friend2='$li_username'")
+	or die('Failed to get past posts from database.');
+	while ($friends_row = mysqli_fetch_array($friend1_data)){
+		$friend = $friends_row['friend1'];
+		echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
+	}
+?>
+</ul>
+
+<?php
+	$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
+	or die('Error connecting to MySQL server.');
+	
 	if (array_key_exists("title", $_POST)){ // an entry has been submitted already -- don't worry abt if 'entry' exists, b/c 'title' existing is sufficient
 		$title = $_POST['title'];                                                                                        // since form was submitted
 		$entry = $_POST['entry'];
@@ -63,7 +83,7 @@
 	echo "</div>";
 	
 	mysqli_close($dbc);
-	unset($date);
+	unset($datetime); // necessary? *****************
 	
 ?>
 <script src="js/jquery-2.0.3.min.js"></script>
