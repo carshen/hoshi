@@ -21,11 +21,32 @@
 			while ($row = mysqli_fetch_array($data)){
 				echo "<div class='pastpost'>";
 				echo $row['date']."<br>".$row['title']."<br>".$row['entry'];
-				$entrydate = $row['date'];
+				$postID = $row['postID'];
 				echo "</div><br>";
+				echo "<a href='#'>comments</a>";
+				echo "<div>"; // identify this div later *******************
+				$postcomments = mysqli_query($dbc, "SELECT comment, commenter, date FROM comments WHERE postID=$postID");
+				while ($c_row = mysqli_fetch_array($postcomments)){
+					echo $c_row['comment']."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
+					// ********** use consistent string convention
+				}
+				echo "</div>";
+				echo "<form action='profile.php? method='GET'><label>comment</label>" .
+				"<input type='text' name='comment'><input type='hidden' name='postID' value='$postID'><input type='hidden' name='friend' value='$friendname'>".
+				"<input type='submit'></form>";
 			}
 			echo "</div>";
-			
+			if (isset($_GET['comment'])){
+				$datetime = new DateTime();
+				$date = $datetime->format('y-m-d h:i:s');
+				$comment = $_GET['comment'];
+				$postID = $_GET['postID'];
+				$commentquery = "INSERT INTO comments (postID, comment, owner, commenter, date)" .
+				"VALUES ('$postID', '$comment', '$user', '$friendname', '$date')";
+				//unset datetime?***********
+				mysqli_query($dbc, $commentquery)
+				or die('Error adding comment');
+			}
 			// get friend's friend list
 			$profilefriends = array(); // **problems??
 			$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$friendname'")
