@@ -4,6 +4,7 @@
 	</head>
 	<body>
 	<?php
+		ob_start();
 		include 'authenticate.php';
 		include 'dbc.php';
 		
@@ -37,7 +38,7 @@
 					echo "<div class='editingcomment'></div>";
 					echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
 					if ($c_row['commenter'] == $user) {
-						echo  "<form method='POST' action='profile.php?&friend=$friendname'>";
+						echo  "<form class='deleteform' method='POST' action='profile.php?&friend=$friendname'>";
 						$commentID = $c_row['commentID'];
 						echo "<input class='deletecommentID' type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete'>";
 						echo "</form>";
@@ -121,12 +122,13 @@
 			
 			//edit a comment
 			if (isset($_POST['editcommentID'])){
-				echo "$['editcommentID']";
-				$editedcomment = $_POST['editcomment'];
-				$commentID = $_POST['commentID'];
-				$editquery = "UPDATE comments SET comment='$editedcomment' WHERE commentID = '$editcommentID'";
+				$editcommentID = $_POST['editcommentID'];
+				echo "$editcommentID";
+				$comment = mysqli_real_escape_string($dbc, $_POST['cmt']);
+				$editquery = "UPDATE comments SET comment='$comment' WHERE commentID = '$editcommentID'";
 				mysqli_query($dbc, $editquery)
 				or die ('Error editing comment.');
+				header("Location: profile.php?&friend=$friendname", 302);
 			}
 		} else {
 			echo "<h3>Page not found.</h3>";
@@ -142,14 +144,14 @@ $(document).ready(function(){
 		// CLICKING EDIT AND CANCELLING EDIT
 	$('.edit').click(function(){
 		var cmt = $(this).siblings(".comment").text();
-		
 		$(this).siblings(".comment").hide();
 //		$(this).siblings(".comment").css("background", "yellow");
 		if ($(this).siblings('.editingcomment').find('.ecomment').length){
 			$(this).siblings('.editingcomment').show();
 		} else {
-			//var editcommentID = $(this).siblings('.deletecommentID').val();
-			$(this).siblings('.editingcomment').append("<form action='profile.php?&friend=" + friendname + "' method='POST'><input class='ecomment' name='cmt' value='" + cmt + "' type='text'><input type='submit' value='edit'></form>");
+			var editcommentID = $(this).siblings('.deleteform').find('.deletecommentID').val();
+			$(this).siblings('.editingcomment').append("<form action='profile.php?&friend=" + friendname + "' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><input class='ecomment' name='cmt' value='' type='text'><input type='submit' value='edit'></form>");
+			$(this).siblings('.editingcomment').find('.ecomment').val(cmt);
 		}
 		
 		if ($(this).siblings('.cancel').length){
