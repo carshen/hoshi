@@ -1,19 +1,24 @@
 <?php
+	ob_start();
 	include 'dbc.php';
 	include 'authenticate.php'; // prompt log-in of user
 	
 	// query to get the matching username and password from table
 	$li_username = $_COOKIE['username'];
-	echo "you are logged in as $li_username<br>";
-
+	echo "<div id='liinfo'><div id='limessage'>you are logged in as $li_username</div>";
+	
+	//connect, query and close the database
+	$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
+	or die('Error connecting to MySQL server.');
 ?>
 <html>
 <head>
 <link type="text/css" rel="stylesheet" href="css/custom.css">
 </head>
 <body>
+<a href="logout.php" id="logout">LOG OUT</a>
+</div>
 <a href="#" id="entry">ADD ENTRY</a> <a href="#" id="posthistory">HISTORY</a> 
-<a href="logout.php">LOG OUT</a>
 <form action="home.php" method="POST" id="postentry">
 	<label>Title</label><br>
 	<input type="text" name="title"><br>
@@ -21,13 +26,93 @@
 	<textarea rows="8" cols="80" name="entry" ></textarea><br>
 	<input type="submit" value="Publish" id="submit" name="submit"/>
 </form>
-<br><p>friends</p>
-<ul>
 <?php
-	//connect, query and close the database
-	$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
-	or die('Error connecting to MySQL server.');
+
+	// add a post
+	if (isset($_POST['title'])){ 
+		$title = $_POST['title']; 
+		$entry = $_POST['entry'];
+		$datetime = new DateTime();
+		$date = $datetime->format('y-m-d h:i:s');
+
+		$query = "INSERT INTO entries (username, title, entry, date) ".
+		"VALUES ('$li_username', '$title', '$entry', '$date')";
+		mysqli_query($dbc, $query)
+		or die('Error querying database.');
+		echo "<br><p id='recorded'>Your entry has been recorded.</p>";
+	}
 	
+	//delete a post
+	if (isset($_POST['deletepost'])){
+		$deleted_postID = $_POST['deletepost'];
+		mysqli_query($dbc, "DELETE FROM entries WHERE postID='$deleted_postID'")
+		or die('Failed to delete post.');
+		echo "<p id='deletenotice'>The entry has been deleted.</p>";
+	}
+	// DISPLAY ALL POSTS
+	// query for the posts in history
+	$data = mysqli_query($dbc, "SELECT * FROM entries WHERE username='$li_username'")
+	or die('Failed to get past posts from database.');
+	
+	// display past posts in #history panel
+	echo "<div id='history'>";
+	while ($row = mysqli_fetch_array($data)){
+		echo "<div class='pastpost'>".$row['date']."<br>".$row['title']."<br>".$row['entry'];
+		$postID = $row['postID'];
+		echo "<br><form method='POST' action='home.php'>";
+		echo "<input class='delete' type=hidden name='deletepost' value='$postID'/>";
+		echo "<input type='submit' value='delete post'/>";
+		echo "</form><br></div>";
+		$postID = $row['postID'];
+		// print all the comments of that post
+		echo "<div id='postcommentpanel'>";
+		$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID='$postID'");
+		while ($c_row = mysqli_fetch_array($postcomments)){
+			echo $c_row['comment']."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
+			echo  "<form method='POST' action='home.php'>";
+			$commentID = $c_row['commentID'];
+			echo "<input type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete comment'>";
+			echo "</form>";
+			// ********** use consistent string convention
+		}
+		echo "</div>";
+		// post comments
+		echo "<form action='home.php' method='POST'><label>comment</label><br>" .
+		"<textarea rows='8' cols='50' name='comment'></textarea><input type='hidden' name='commenting' value='$postID'>".
+		"<br><input type='submit' value='comment'></form>";
+	}
+	echo "</div>";
+	// END DISPLAY POSTS
+	
+	// add a comment
+	if (isset($_POST['comment'])){
+		$datetime = new DateTime();
+		$date = $datetime->format('y-m-d h:i:s');
+		$comment = mysqli_real_escape_string($dbc, $_POST['comment']);
+		$postID = $_POST['commenting'];
+		$commentquery = "INSERT INTO comments (postID, comment, owner, commenter, date)" .
+		"VALUES ('$postID', '$comment', '$li_username', '$li_username', '$date')";
+		//unset datetime?***********
+		mysqli_query($dbc, $commentquery)
+		or die('Error adding comment');
+		header("Location: home.php", 302);
+	}
+	
+	// delete a comment
+	if (isset($_POST['deletecomment'])){
+		$deletecomment = $_POST['deletecomment'];
+		$deletecommentquery = "DELETE FROM comments WHERE commentID= '$deletecomment'";
+		mysqli_query($dbc, $deletecommentquery)
+		or die ('Error deleting comment');
+		header("Location: home.php", 302);
+	}
+
+?>
+
+<br>
+<div id="friendspanel">friends
+	<ul>
+<?php
 	$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$li_username'")
 	or die('Failed to get past posts from database.');
 	while ($friends_row = mysqli_fetch_array($friend2_data)){
@@ -41,51 +126,11 @@
 		$friend = $friends_row['friend1'];
 		echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
 	}
-?>
-</ul>
-
-<?php
-	$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
-	or die('Error connecting to MySQL server.');
-	
-	if (array_key_exists("title", $_POST)){ // an entry has been submitted already -- don't worry abt if 'entry' exists, b/c 'title' existing is sufficient
-		$title = $_POST['title'];                                                                                        // since form was submitted
-		$entry = $_POST['entry'];
-		$datetime = new DateTime();
-		$date = $datetime->format('y-m-d h:i:s');
-
-		$query = "INSERT INTO entries (userid, username, title, entry, date) ".
-		"VALUES (100, '$li_username', '$title', '$entry', '$date')";
-		mysqli_query($dbc, $query)
-		or die('Error querying database.');
-		echo "<br><p id='recorded'>Your entry has been recorded.</p>";
-	}
-	//delete post before rendering
-	if (array_key_exists("delete", $_POST)){
-		$deletedate = $_POST['delete'];
-		mysqli_query($dbc, "DELETE FROM entries WHERE date='$deletedate'")
-		or die('Failed to delete post.');
-		echo "<p id='deletenotice'>The entry has been deleted.</p>";
-	}
-	// query for the posts in history
-	$data = mysqli_query($dbc, "SELECT * FROM entries WHERE username='$li_username'")
-	or die('Failed to get past posts from database.');
-	
-	// display past posts in #history panel
-	echo "<div id='history'>";
-	while ($row = mysqli_fetch_array($data)){
-		echo "<div class='pastpost'>";
-		echo $row['date']."<br>".$row['title']."<br>".$row['entry'];
-		$entrydate = $row['date'];
-		echo "<br><form method='POST' action='home.php'><input class='delete' type=hidden name='delete' value='$entrydate'/><input type='submit' value='delete'/></form><br><br>";
-		echo "</div>";
-	}
-	echo "</div>";
-	
 	mysqli_close($dbc);
 	unset($datetime); // necessary? *****************
-	
 ?>
+	</ul>
+</div>
 <script src="js/jquery-2.0.3.min.js"></script>
 <script src="js/application.js"></script>
 </body>
