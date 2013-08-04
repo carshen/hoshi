@@ -68,12 +68,20 @@
 		echo "<div id='postcommentpanel'>";
 		$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID='$postID'");
 		while ($c_row = mysqli_fetch_array($postcomments)){
-			echo $c_row['comment']."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
-			echo  "<form method='POST' action='home.php'>";
+			echo "<div class='onecomment'>";
+			echo "<div class='editingcomment'></div>";
+			echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
+			// delete button
+			echo  "<form class='deleteform' method='POST' action='home.php'>";
 			$commentID = $c_row['commentID'];
-			echo "<input type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete comment'>";
+			echo "<input type='hidden' name='deletecomment' value='$commentID' class='deletecommentID'><input type=submit value='delete comment'>";
 			echo "</form>";
+			// edit button
+			if ($c_row['commenter'] == $li_username) {
+				echo "<div class='edit'>edit</div>";
+			}
 			// ********** use consistent string convention
+			echo "</div>"; // for .onecomment
 		}
 		echo "</div>";
 		// post comments
@@ -107,6 +115,17 @@
 		header("Location: home.php", 302);
 	}
 
+	
+	//edit a comment
+	if (isset($_POST['editcommentID'])){
+		$editcommentID = $_POST['editcommentID'];
+		echo "$editcommentID";
+		$comment = mysqli_real_escape_string($dbc, $_POST['cmt']);
+		$editquery = "UPDATE comments SET comment='$comment' WHERE commentID = '$editcommentID'";
+		mysqli_query($dbc, $editquery)
+		or die ('Error editing comment.');
+		header("Location: home.php", 302);
+	}
 ?>
 
 <br>
@@ -133,5 +152,36 @@
 </div>
 <script src="js/jquery-2.0.3.min.js"></script>
 <script src="js/application.js"></script>
+<script>
+$(document).ready(function(){
+		// CLICKING EDIT AND CANCELLING EDIT
+	$('.edit').click(function(){
+		var cmt = $(this).siblings(".comment").text();
+		$(this).siblings(".comment").hide();
+		if ($(this).siblings('.editingcomment').find('.ecomment').length){
+			$(this).siblings('.editingcomment').show();
+		} else {
+			var editcommentID = $(this).siblings('.deleteform').find('.deletecommentID').val();
+			$(this).siblings('.editingcomment').append("<form action='home.php' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><input class='ecomment' name='cmt' value='' type='text'><input type='submit' value='edit'></form>");
+			$(this).siblings('.editingcomment').find('.ecomment').val(cmt);
+		}
+		
+		if ($(this).siblings('.cancel').length){
+			$(this).siblings('.cancel').show();
+		} else {
+			$(this).parent().append("<div class='cancel'>cancel</div>");
+		}
+		$(this).hide();
+		$('.cancel').click(function(){
+			$(this).siblings('.comment').show();
+			$(this).siblings('.editingcomment').hide();
+			$(this).hide();
+			$(this).siblings('.edit').show();
+		});
+		
+	});
+});
+
+</script>
 </body>
 </html>

@@ -42,7 +42,7 @@
 						$commentID = $c_row['commentID'];
 						echo "<input class='deletecommentID' type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete'>";
 						echo "</form>";
-						echo "<a href=# class='edit'>edit</a>";
+						echo "<div class='edit'>edit</div>";
 					}
 					// ********** use consistent string convention
 					echo "</div>"; // for 'onecomment';
@@ -157,7 +157,7 @@ $(document).ready(function(){
 		if ($(this).siblings('.cancel').length){
 			$(this).siblings('.cancel').show();
 		} else {
-			$(this).parent().append("<a class='cancel' href=#>cancel</a>");
+			$(this).parent().append("<div class='cancel'>cancel</div>");
 		}
 		$(this).hide();
 		$('.cancel').click(function(){
@@ -168,7 +168,7 @@ $(document).ready(function(){
 		});
 		
 	});
-	});
+});
 	</script>
 	</body>
 </html>
