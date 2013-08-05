@@ -22,10 +22,38 @@
 			$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
 			or die('Error connecting to MySQL server.');
 			
+			// add and delete buttons
+			$friendname = $_GET['friend'];
+
+			// and and delete buttons
+			echo "<div id='addndelete'>";
+			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input type='submit' value='add friend' name='addfriend'></form>";
+			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input type='submit' value='delete friend' name='deletefriend'></form>";
+			echo "</div>";
+			
+			// profile title
+			echo "<div id='profilename'>$friendname</div><br>";
+			
+			echo "<div class='profilepage'>";
+			
+			// add and delete friends
+			if (isset($_POST['addfriend'])){
+				$datetime = new DateTime();
+				$date = $datetime->format('y-m-d h:i:s');
+				
+				$addquery = "INSERT INTO friends (friend1, friend2, since) VALUES ('$user', '$friendname', '$date')";
+				mysqli_query($dbc, $addquery)
+				or die('Error adding friend.');
+				//unset($datetime); // necessary?*********************
+			}
+			if (isset($_POST['deletefriend'])){
+				$user = $_COOKIE['username'];
+				$deletequery = "DELETE FROM friends WHERE friend1='$user' AND friend2='$friendname'";
+				mysqli_query($dbc, $deletequery)
+				or die ('Error deleting friend.');
+			}
 			
 			// START RENDERING FRIEND'S PROFILE
-			$friendname = $_GET['friend'];
-			echo "<div id='profilename'>$friendname</div><br>";
 			
 			// get friend's posts
 			$data = mysqli_query($dbc, "SELECT * FROM entries WHERE username='$friendname'")
@@ -40,27 +68,28 @@
 						"<br>".$row['entry'];
 						$postID = $row['postID'];
 					echo "</div><br>";
-					echo "<div>comments</div>";
-					echo "<div>"; // identify this div later *******************
+					// comments area
+					echo "<div class='commentsunroll'>comments</div>";
+					echo "<div class='allcomments'>"; // identify this div later *******************
 					$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID=$postID");
 					while ($c_row = mysqli_fetch_array($postcomments)){
 						echo "<div class='onecomment'>";
 						echo "<div class='editingcomment'></div>";
-						echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
+						echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." at ".$c_row['date']."<br>";
 						if ($c_row['commenter'] == $user) {
 							echo  "<form class='deleteform' method='POST' action='profile.php?&friend=$friendname'>";
 							$commentID = $c_row['commentID'];
 							echo "<input class='deletecommentID' type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete'>";
 							echo "</form>";
-							echo "<div class='edit'>edit</div>";
+							echo "<button type='button' class='edit'>edit</button>";
 						}
 						// ********** use consistent string convention
 						echo "</div>"; // for 'onecomment';
 					}
-					echo "</div>"; // for unnamed div
 					echo "<form action='profile.php?&friend=$friendname' method='POST'><label>comment</label><br>" .
-					"<textarea rows='8' cols='50' name='comment'></textarea><input type='hidden' name='postID' value='$postID'><input type='hidden' name='friend' value='$friendname'>".
+					"<textarea rows='8' cols='100' name='comment'></textarea><input type='hidden' name='postID' value='$postID'><input type='hidden' name='friend' value='$friendname'>".
 					"<br><input type='submit'></form>";
+					echo "</div>"; // for allcomments
 				echo "</div>"; // for .postncomments
 			}
 			echo "</div>"; // for #profilehistory
@@ -108,28 +137,6 @@
 			}
 			echo "</div>";
 			
-			// add and delete buttons
-			echo "<div id='addndelete'>";
-			echo "<form action='profile.php?friend=$friendname' method='POST'><input type='submit' value='add friend' name='addfriend'></form>";
-			echo "<form action='profile.php?friend=$friendname' method='POST'><input type='submit' value='delete friend' name='deletefriend'></form>";
-			echo "</div>";
-			// add and delete friends
-			if (isset($_POST['addfriend'])){
-				$datetime = new DateTime();
-				$date = $datetime->format('y-m-d h:i:s');
-				
-				$addquery = "INSERT INTO friends (friend1, friend2, since) VALUES ('$user', '$friendname', '$date')";
-				mysqli_query($dbc, $addquery)
-				or die('Error adding friend.');
-				//unset($datetime); // necessary?*********************
-			}
-			if (isset($_POST['deletefriend'])){
-				$user = $_COOKIE['username'];
-				$deletequery = "DELETE FROM friends WHERE friend1='$user' AND friend2='$friendname'";
-				mysqli_query($dbc, $deletequery)
-				or die ('Error deleting friend.');
-			}
-			
 			//edit a comment
 			if (isset($_POST['editcommentID'])){
 				$editcommentID = $_POST['editcommentID'];
@@ -139,14 +146,15 @@
 				mysqli_query($dbc, $editquery)
 				or die ('Error editing comment.');
 				header("Location: profile.php?&friend=$friendname", 302);
+			
 			}
+		echo "</div>"; //for .profilepage
 		} else {
 		// redirect to log in page
 			header("Location: index.php", 302);
 		}
 
 	?>
-	
 	<script src="js/jquery-2.0.3.min.js"></script>
 	<script src="js/application.js"></script>
 	<script>
@@ -161,14 +169,14 @@ $(document).ready(function(){
 			$(this).siblings('.editingcomment').show();
 		} else {
 			var editcommentID = $(this).siblings('.deleteform').find('.deletecommentID').val();
-			$(this).siblings('.editingcomment').append("<form action='profile.php?&friend=" + friendname + "' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><input class='ecomment' name='cmt' value='' type='text'><input type='submit' value='edit'></form>");
+			$(this).siblings('.editingcomment').append("<form action='profile.php?&friend=" + friendname + "' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='5' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input type='submit' value='ok'></form>");
 			$(this).siblings('.editingcomment').find('.ecomment').val(cmt);
 		}
 		
 		if ($(this).siblings('.cancel').length){
 			$(this).siblings('.cancel').show();
 		} else {
-			$(this).parent().append("<div class='cancel'>cancel</div>");
+			$(this).parent().append("<button type='button' class='cancel'>cancel</button>");
 		}
 		$(this).hide();
 		$('.cancel').click(function(){

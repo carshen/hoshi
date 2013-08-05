@@ -71,13 +71,12 @@ textarea {
 	position: relative;
 	width: 100%;
 }
-
 #profilename{
 	font-size: 3.5em;
 	width: 100%;
-	margin: 0 auto;
-	border-style: dotted;
+	margin-bottom: 1%;
 	text-align: center;
+	float: left;
 	}
 
 #profilefriends{
@@ -91,18 +90,17 @@ textarea {
 }
 
 #addndelete{
-	border-style: dotted;
 	width: 100%;
 	float: left;
 	position: relative;
 	top: 1%;
 	right: 1%;
-	padding-left: 40%;
-	overflow: auto;
+	overflow: hidden;
 }
 .addndeletefriend {
-	width: 10%;
-	float: left;
+	width: 6%;
+	float: right;
+	overflow: hidden;
 }
 .postncomments{
 	padding-left: 5%;
@@ -148,7 +146,10 @@ textarea {
 	margin-right: 1%;
 	float: left;
 }
+.submitedit {
+	background: red;
 
+}
 #profilehistory{
 	margin-left: 5%;
 	margin-right: 1%;
