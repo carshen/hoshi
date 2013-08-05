@@ -1,3 +1,4 @@
+/* HOME SCREEN*/
 #postentry {
 	padding: 1.5%;
 	border-style: dotted;
@@ -8,9 +9,125 @@ textarea {
 	resize: none;
 }
 
+#postcommentpanel{
+	border-style: dotted;
+	border-width: 1px;
+}
+
 #history{
 	padding: 1.5%;
 	border-style: dotted;
 	border-width: 1px;
 	width: 42%;
-}z
+}
+
+#friendspanel{
+	border-style: dotted;
+	width: 10%;
+}
+#logout{
+	border-style: solid;
+	border-width: 1px;
+	position: relative;
+	left: 58%;
+
+}
+#limessage{
+	position: relative;
+	border-width: 1px;
+	border-style: solid;
+
+}
+#liinfo {
+	position: absolute;
+	border-style: dotted;
+	right: 1%;
+	top: 1%;
+}
+
+/* END HOME SCREEN */
+
+
+/* LOG IN */
+#enterpanel{
+	border-style: dotted;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	margin-left: 40%;
+	padding: 5%;
+	width: 10%;
+	overflow: auto;
+}
+.enterdetails{
+	border-style: solid;
+	border-width: 1px;
+}
+
+
+/* END LOG IN */
+
+/*PROFILE*/
+#profilename{
+	font-size: 3.5em;
+	width: 100%;
+	margin: 0 auto;
+	border-style: dotted;
+	text-align: center;
+	}
+
+#profilefriends{
+	border-style: dotted;
+	border-width: 1px;
+	width: 10%;
+	position: absolute;
+	top: 10%;
+	right: 1%;
+}
+
+#addndelete{
+	position: absolute;
+	border-style: dotted;
+	top: 1%;
+	right: 1%;
+}
+
+.postncomments{
+	border-style: dotted;
+	border-width: 1px;
+	padding-left: 5%;
+	padding-right: 5%;
+	padding-top: 2%;
+	padding-bottom: 2%;
+	background: #D5DCE6;
+	position: relative;
+}
+.pastpost {
+	padding: 1%;
+	background: #DFE7F2;
+}
+.pastpostdate{
+	text-align: right;
+}
+.pastposttitle{
+	font-size: 2em;
+	text-align: center;
+}
+.onecomment{
+	border-style: dotted;
+	border-width: 1px;
+}
+.edit {
+	background: #92AED6;
+	width: 2.5%;
+	text-align: center;
+}
+.cancel {
+	background: #92AED6;
+	width: 4%;
+	text-align: center;
+}
+#profilehistory{
+	margin-left: 5%;
+	margin-right: 5%;
+}
+/*END PROFILE*/

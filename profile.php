@@ -1,59 +1,69 @@
+<?php
+	ob_start();
+	include 'authenticate.php';
+	include 'dbc.php';
+?>
 <html>
 	<head>
 	<link type="text/css" rel="stylesheet" href="css/custom.css">
 	</head>
 	<body>
 	<?php
-		ob_start();
-		include 'authenticate.php';
-		include 'dbc.php';
-		
+		// a profile is set
 		if (isset($_GET['friend'])){
+			// current user
 			$user = $_COOKIE['username'];
+			// if trying to view own public profile, redirect to home profile
 			if ($user == $_GET['friend']){
 				header("Location: home.php", 302);
 			}
 			
-			
 			//connect, query and close the database
 			$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
 			or die('Error connecting to MySQL server.');
+			
+			
+			// START RENDERING FRIEND'S PROFILE
 			$friendname = $_GET['friend'];
 			echo "<div id='profilename'>$friendname</div><br>";
+			
 			// get friend's posts
 			$data = mysqli_query($dbc, "SELECT * FROM entries WHERE username='$friendname'")
 			or die('Failed to get past posts from database.');
+			// render all blog posts of friend
 			echo "<div id='profilehistory'>";
 			while ($row = mysqli_fetch_array($data)){
-				echo "<div class='postncomment'>";
-				echo "<div class='pastpost'>";
-				echo $row['date']."<br>".$row['title']."<br>".$row['entry'];
-				$postID = $row['postID'];
-				echo "</div><br>";
-				echo "<a href='#'>comments</a>";
-				echo "<div>"; // identify this div later *******************
-				$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID=$postID");
-				while ($c_row = mysqli_fetch_array($postcomments)){
-					echo "<div class='onecomment'>";
-					echo "<div class='editingcomment'></div>";
-					echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
-					if ($c_row['commenter'] == $user) {
-						echo  "<form class='deleteform' method='POST' action='profile.php?&friend=$friendname'>";
-						$commentID = $c_row['commentID'];
-						echo "<input class='deletecommentID' type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete'>";
-						echo "</form>";
-						echo "<div class='edit'>edit</div>";
+				echo "<div class='postncomments'>"; // div containing 1 post and its comments
+					echo "<div class='pastpost'>"; // div for the post
+						echo "<div class='pastpostdate'>".$row['date']."</div>".
+						"<div class='pastposttitle'>".$row['title']."</div>".
+						"<br>".$row['entry'];
+						$postID = $row['postID'];
+					echo "</div><br>";
+					echo "<div>comments</div>";
+					echo "<div>"; // identify this div later *******************
+					$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID=$postID");
+					while ($c_row = mysqli_fetch_array($postcomments)){
+						echo "<div class='onecomment'>";
+						echo "<div class='editingcomment'></div>";
+						echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
+						if ($c_row['commenter'] == $user) {
+							echo  "<form class='deleteform' method='POST' action='profile.php?&friend=$friendname'>";
+							$commentID = $c_row['commentID'];
+							echo "<input class='deletecommentID' type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete'>";
+							echo "</form>";
+							echo "<div class='edit'>edit</div>";
+						}
+						// ********** use consistent string convention
+						echo "</div>"; // for 'onecomment';
 					}
-					// ********** use consistent string convention
-					echo "</div>"; // for 'onecomment';
-				}
-				echo "</div>"; // for unnamed div
-				echo "<form action='profile.php?&friend=$friendname' method='POST'><label>comment</label><br>" .
-				"<textarea rows='8' cols='50' name='comment'></textarea><input type='hidden' name='postID' value='$postID'><input type='hidden' name='friend' value='$friendname'>".
-				"<br><input type='submit'></form>";
-				echo "</div>"; // for postncomment
+					echo "</div>"; // for unnamed div
+					echo "<form action='profile.php?&friend=$friendname' method='POST'><label>comment</label><br>" .
+					"<textarea rows='8' cols='50' name='comment'></textarea><input type='hidden' name='postID' value='$postID'><input type='hidden' name='friend' value='$friendname'>".
+					"<br><input type='submit'></form>";
+				echo "</div>"; // for .postncomments
 			}
-			echo "</div>";
+			echo "</div>"; // for #profilehistory
 			
 			// delete a comment
 			if (isset($_POST['deletecomment'])){
@@ -131,7 +141,8 @@
 				header("Location: profile.php?&friend=$friendname", 302);
 			}
 		} else {
-			echo "<h3>Page not found.</h3>";
+		// redirect to log in page
+			header("Location: index.php", 302);
 		}
 
 	?>

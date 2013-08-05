@@ -4,8 +4,8 @@
 	include 'authenticate.php'; // prompt log-in of user
 	
 	// query to get the matching username and password from table
-	$li_username = $_COOKIE['username'];
-	echo "<div id='liinfo'><div id='limessage'>you are logged in as $li_username</div>";
+	$user = $_COOKIE['username'];
+	echo "<div id='liinfo'><div id='limessage'>you are logged in as $user</div>";
 	
 	//connect, query and close the database
 	$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
@@ -36,7 +36,7 @@
 		$date = $datetime->format('y-m-d h:i:s');
 
 		$query = "INSERT INTO entries (username, title, entry, date) ".
-		"VALUES ('$li_username', '$title', '$entry', '$date')";
+		"VALUES ('$user', '$title', '$entry', '$date')";
 		mysqli_query($dbc, $query)
 		or die('Error querying database.');
 		echo "<br><p id='recorded'>Your entry has been recorded.</p>";
@@ -51,7 +51,7 @@
 	}
 	// DISPLAY ALL POSTS
 	// query for the posts in history
-	$data = mysqli_query($dbc, "SELECT * FROM entries WHERE username='$li_username'")
+	$data = mysqli_query($dbc, "SELECT * FROM entries WHERE username='$user'")
 	or die('Failed to get past posts from database.');
 	
 	// display past posts in #history panel
@@ -77,7 +77,7 @@
 			echo "<input type='hidden' name='deletecomment' value='$commentID' class='deletecommentID'><input type=submit value='delete comment'>";
 			echo "</form>";
 			// edit button
-			if ($c_row['commenter'] == $li_username) {
+			if ($c_row['commenter'] == $user) {
 				echo "<div class='edit'>edit</div>";
 			}
 			// ********** use consistent string convention
@@ -99,7 +99,7 @@
 		$comment = mysqli_real_escape_string($dbc, $_POST['comment']);
 		$postID = $_POST['commenting'];
 		$commentquery = "INSERT INTO comments (postID, comment, owner, commenter, date)" .
-		"VALUES ('$postID', '$comment', '$li_username', '$li_username', '$date')";
+		"VALUES ('$postID', '$comment', '$user', '$user', '$date')";
 		//unset datetime?***********
 		mysqli_query($dbc, $commentquery)
 		or die('Error adding comment');
@@ -132,14 +132,14 @@
 <div id="friendspanel">friends
 	<ul>
 <?php
-	$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$li_username'")
+	$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$user'")
 	or die('Failed to get past posts from database.');
 	while ($friends_row = mysqli_fetch_array($friend2_data)){
 		$friend = $friends_row['friend2'];
 		echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
 	}
 	
-	$friend1_data = mysqli_query($dbc, "SELECT friend1 FROM friends WHERE friend2='$li_username'")
+	$friend1_data = mysqli_query($dbc, "SELECT friend1 FROM friends WHERE friend2='$user'")
 	or die('Failed to get past posts from database.');
 	while ($friends_row = mysqli_fetch_array($friend1_data)){
 		$friend = $friends_row['friend1'];
