@@ -67,6 +67,11 @@ textarea {
 /* END LOG IN */
 
 /*PROFILE*/
+.profilepage{
+	position: relative;
+	width: 100%;
+}
+
 #profilename{
 	font-size: 3.5em;
 	width: 100%;
@@ -76,30 +81,37 @@ textarea {
 	}
 
 #profilefriends{
-	border-style: dotted;
-	border-width: 1px;
-	width: 10%;
-	position: absolute;
-	top: 10%;
-	right: 1%;
+	float: right;
+	width: 18%;
+	padding-top: 1%;
+	padding-bottom: 1%;
+	margin-right: 2%;
+	padding-left: 2%;
+	background: #DFE8F2;
 }
 
 #addndelete{
-	position: absolute;
 	border-style: dotted;
+	width: 100%;
+	float: left;
+	position: relative;
 	top: 1%;
 	right: 1%;
+	padding-left: 40%;
+	overflow: auto;
 }
-
+.addndeletefriend {
+	width: 10%;
+	float: left;
+}
 .postncomments{
-	border-style: dotted;
-	border-width: 1px;
 	padding-left: 5%;
 	padding-right: 5%;
 	padding-top: 2%;
 	padding-bottom: 2%;
 	background: #D5DCE6;
 	position: relative;
+	margin-bottom: 1%;
 }
 .pastpost {
 	padding: 1%;
@@ -112,22 +124,35 @@ textarea {
 	font-size: 2em;
 	text-align: center;
 }
+.editingcomment{
+}
 .onecomment{
-	border-style: dotted;
-	border-width: 1px;
+	margin-bottom: 1%;
+	background: #DFE8F2;
+	padding: 1%;
+}
+.comment {
 }
 .edit {
-	background: #92AED6;
-	width: 2.5%;
-	text-align: center;
-}
-.cancel {
-	background: #92AED6;
 	width: 4%;
 	text-align: center;
 }
+
+.cancel {
+	width: 6%;
+	text-align: center;
+}
+.deleteform{
+	width: 5%;
+	height: 1%;
+	margin-right: 1%;
+	float: left;
+}
+
 #profilehistory{
 	margin-left: 5%;
-	margin-right: 5%;
+	margin-right: 1%;
+	float: left;
+	width: 70%;
 }
 /*END PROFILE*/
