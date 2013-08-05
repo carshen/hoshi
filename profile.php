@@ -27,8 +27,8 @@
 
 			// and and delete buttons
 			echo "<div id='addndelete'>";
-			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input type='submit' value='add friend' name='addfriend'></form>";
-			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input type='submit' value='delete friend' name='deletefriend'></form>";
+			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='add friend' name='addfriend'></form>";
+			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='delete friend' name='deletefriend'></form>";
 			echo "</div>";
 			
 			// profile title
@@ -74,28 +74,31 @@
 					$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID=$postID");
 					while ($c_row = mysqli_fetch_array($postcomments)){
 						echo "<div class='onecomment'>";
-						echo "<div class='editingcomment'></div>";
-						echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." at ".$c_row['date']."<br>";
+						echo "<div class='comment'>".$c_row['comment']."</div>";
+						echo "<div class='commentdetail'>".$c_row['commenter']." at ".$c_row['date']."</div>";
 						if ($c_row['commenter'] == $user) {
+							echo "<div class='editingcomment'></div>";
+							echo "<div class='modbuttons'>";
 							echo  "<form class='deleteform' method='POST' action='profile.php?&friend=$friendname'>";
 							$commentID = $c_row['commentID'];
-							echo "<input class='deletecommentID' type='hidden' name='deletecomment' value='$commentID'><input type=submit value='delete'>";
+							echo "<input class='deletecommentID' type='hidden' name='deletecomment' value='$commentID'><input class='deletebutton' type=submit value='delete'>";
 							echo "</form>";
 							echo "<button type='button' class='edit'>edit</button>";
+							echo "</div>"; // for .editingcomment where the comment box and mod buttons will go
 						}
 						// ********** use consistent string convention
 						echo "</div>"; // for 'onecomment';
 					}
 					echo "<form action='profile.php?&friend=$friendname' method='POST'><label>comment</label><br>" .
 					"<textarea rows='8' cols='100' name='comment'></textarea><input type='hidden' name='postID' value='$postID'><input type='hidden' name='friend' value='$friendname'>".
-					"<br><input type='submit'></form>";
+					"<br><input class='submitcomment' type='submit' value='submit'></form>";
 					echo "</div>"; // for allcomments
 				echo "</div>"; // for .postncomments
 			}
 			echo "</div>"; // for #profilehistory
 			
 			// delete a comment
-			if (isset($_POST['deletecomment'])){
+			if (isset($_POST['deletecomment']) && !isset($_POST['editcommentID'])){
 				$deletecomment = $_POST['deletecomment'];
 				$deletecommentquery = "DELETE FROM comments WHERE commentID= '$deletecomment'";
 				mysqli_query($dbc, $deletecommentquery)
@@ -124,7 +127,7 @@
 			or die('Failed to get past posts from database.');
 			while ($friends_row = mysqli_fetch_array($friend2_data)){
 				$friend = $friends_row['friend2'];
-				echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
+				echo "<form method='GET' action='profile.php'><input class='friendbuttons' type='submit' name='friend' value='$friend'></form>";
 				$profilefriends['$friend'] = 1;
 			}
 	
@@ -132,20 +135,29 @@
 			or die('Failed to get past posts from database.');
 			while ($friends_row = mysqli_fetch_array($friend1_data)){
 				$friend = $friends_row['friend1'];
-				echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
+				echo "<form method='GET' action='profile.php'><input class='friendbuttons' type='submit' name='friend' value='$friend'></form>";
 				$profilefriends['$friend'] = 1;
 			}
 			echo "</div>";
 			
 			//edit a comment
 			if (isset($_POST['editcommentID'])){
-				$editcommentID = $_POST['editcommentID'];
-				echo "$editcommentID";
-				$comment = mysqli_real_escape_string($dbc, $_POST['cmt']);
-				$editquery = "UPDATE comments SET comment='$comment' WHERE commentID = '$editcommentID'";
-				mysqli_query($dbc, $editquery)
-				or die ('Error editing comment.');
-				header("Location: profile.php?&friend=$friendname", 302);
+				if (!isset($_POST['deletecomment'])){
+					$editcommentID = $_POST['editcommentID'];
+					echo "$editcommentID";
+					$comment = mysqli_real_escape_string($dbc, $_POST['cmt']);
+					$editquery = "UPDATE comments SET comment='$comment' WHERE commentID = '$editcommentID'";
+					mysqli_query($dbc, $editquery)
+					or die ('Error editing comment.');
+					header("Location: profile.php?&friend=$friendname", 302);
+				} else {
+					$deletecommentID = $_POST['editcommentID'];
+					$deletecommentquery = "DELETE FROM comments WHERE commentID= '$deletecommentID'";
+					mysqli_query($dbc, $deletecommentquery)
+					or die ('Error deleting comment');
+					header("Location: profile.php?&friend=$friendname", 302);
+				}
+				
 			
 			}
 		echo "</div>"; //for .profilepage
@@ -159,35 +171,33 @@
 	<script src="js/application.js"></script>
 	<script>
 	var friendname = "<?php echo $friendname; ?>";
-$(document).ready(function(){
+	$(document).ready(function(){
+	
 		// CLICKING EDIT AND CANCELLING EDIT
-	$('.edit').click(function(){
-		var cmt = $(this).siblings(".comment").text();
-		$(this).siblings(".comment").hide();
-//		$(this).siblings(".comment").css("background", "yellow");
-		if ($(this).siblings('.editingcomment').find('.ecomment').length){
-			$(this).siblings('.editingcomment').show();
-		} else {
-			var editcommentID = $(this).siblings('.deleteform').find('.deletecommentID').val();
-			$(this).siblings('.editingcomment').append("<form action='profile.php?&friend=" + friendname + "' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='5' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input type='submit' value='ok'></form>");
-			$(this).siblings('.editingcomment').find('.ecomment').val(cmt);
-		}
-		
-		if ($(this).siblings('.cancel').length){
-			$(this).siblings('.cancel').show();
-		} else {
-			$(this).parent().append("<button type='button' class='cancel'>cancel</button>");
-		}
-		$(this).hide();
-		$('.cancel').click(function(){
-			$(this).siblings('.comment').show();
-			$(this).siblings('.editingcomment').hide();
-			$(this).hide();
-			$(this).siblings('.edit').show();
+		$('.edit').click(function(){
+			var cmt = $(this).parent().siblings('.comment').text();
+			$(this).parent().siblings('.comment').hide();
+			if ($(this).parent().siblings('.editingcomment').find('.ecomment').length){
+				//$(this).parent().siblings('.editingcomment').show();
+				console.log("here");
+				$(this).parent().siblings('.editingcomment').find('.editform').show();
+			} else {
+				var editcommentID = $(this).siblings('.deleteform').find('.deletecommentID').val();
+				$(this).parent().siblings('.editingcomment').append("<form class='editform' action='profile.php?&friend=" + friendname + "' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='5' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input class='submitedit' name='editaction' type='submit' value='ok'><button type='button' class='cancel'>cancel</button><input class='deletebutton' name='deletecomment' type='submit' value='delete'></form>");
+				$(this).parent().siblings('.editingcomment').find('.ecomment').val(cmt);
+			}
+			$(this).parent().siblings('.commentdetail').hide();
+			$(this).parent().hide();
+			
+			$('.cancel').click(function(){
+				$(this).parent().parent().siblings('.modbuttons').show();
+				$(this).parent().hide();
+				$(this).parent().parent().siblings('.commentdetail').show();
+				$(this).parent().parent().siblings('.comment').show();
+			});
+			
 		});
-		
 	});
-});
 	</script>
 	</body>
 </html>
