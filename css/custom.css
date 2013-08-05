@@ -98,10 +98,17 @@ textarea {
 	overflow: hidden;
 }
 .addndeletefriend {
-	width: 6%;
+	width: 5.5%;
 	float: right;
 	overflow: hidden;
+
 }
+
+.friendbuttons{
+	background: #8BAFCC;
+	border: none;
+}
+
 .postncomments{
 	padding-left: 5%;
 	padding-right: 5%;
@@ -114,6 +121,7 @@ textarea {
 .pastpost {
 	padding: 1%;
 	background: #DFE7F2;
+	font-size: 1.2em;
 }
 .pastpostdate{
 	text-align: right;
@@ -130,25 +138,49 @@ textarea {
 	padding: 1%;
 }
 .comment {
+	font-size: 1.2em;
 }
 .edit {
 	width: 4%;
 	text-align: center;
+	background: #8BAFCC;
+	border: none;
 }
-
+.commentsunroll {
+	cursor: pointer;
+}
+.commentsunroll:hover{
+	color: #303B4F;
+}
 .cancel {
 	width: 6%;
 	text-align: center;
+	background: #8BAFCC;
+	border: none;
 }
+
+.deletebutton{
+	background: #8BAFCC;
+	border: none;
+}
+
 .deleteform{
 	width: 5%;
 	height: 1%;
 	margin-right: 1%;
 	float: left;
 }
-.submitedit {
-	background: red;
-
+.submitedit{
+	background: #8BAFCC;
+	border: none;
+}
+.commentdetail {
+	color: #62829C;
+	font-size: 0.9em;
+}
+.submitcomment{
+	background: #8BAFCC;
+	border: none;
 }
 #profilehistory{
 	margin-left: 5%;
