@@ -27,8 +27,8 @@
 
 			// and and delete buttons
 			echo "<div id='addndelete'>";
-			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='add friend' name='addfriend'></form>";
-			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='delete friend' name='deletefriend'></form>";
+			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='+ friend' name='addfriend'></form>";
+			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='- friend' name='deletefriend'></form>";
 			echo "</div>";
 			
 			// profile title

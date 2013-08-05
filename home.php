@@ -1,3 +1,9 @@
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+
 <?php
 	ob_start();
 	include 'dbc.php';
@@ -5,18 +11,34 @@
 	
 	// query to get the matching username and password from table
 	$user = $_COOKIE['username'];
+	echo "<div id='homemenu'>";
 	echo "<div id='liinfo'><div id='limessage'>you are logged in as $user</div>";
 	
 	//connect, query and close the database
 	$dbc = mysqli_connect('localhost', $dbc_user, $dbc_pw, 'journalclone')
 	or die('Error connecting to MySQL server.');
 ?>
-<html>
-<head>
-<link type="text/css" rel="stylesheet" href="css/custom.css">
-</head>
-<body>
-<a href="logout.php" id="logout">LOG OUT</a>
+
+<div id='logout'><a href="logout.php">LOG OUT</a></div></div>
+<div id="friendspanel">friends
+	<ul>
+<?php
+	$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$user'")
+	or die('Failed to get past posts from database.');
+	while ($friends_row = mysqli_fetch_array($friend2_data)){
+		$friend = $friends_row['friend2'];
+		echo "<form method='GET' action='profile.php'><input class='friendbuttons' type='submit' name='friend' value='$friend'></form>";
+	}
+	
+	$friend1_data = mysqli_query($dbc, "SELECT friend1 FROM friends WHERE friend2='$user'")
+	or die('Failed to get past posts from database.');
+	while ($friends_row = mysqli_fetch_array($friend1_data)){
+		$friend = $friends_row['friend1'];
+		echo "<form method='GET' action='profile.php'><input class='friendbuttons' type='submit' name='friend' value='$friend'></form>";
+	}
+
+?>
+	</ul>
 </div>
 <a href="#" id="entry">ADD ENTRY</a> <a href="#" id="posthistory">HISTORY</a> 
 <form action="home.php" method="POST" id="postentry">
@@ -57,31 +79,33 @@
 	// display past posts in #history panel
 	echo "<div id='history'>";
 	while ($row = mysqli_fetch_array($data)){
-		echo "<div class='pastpost'>".$row['date']."<br>".$row['title']."<br>".$row['entry'];
+		echo "<div class='pastposthome'>"."<div class='pastpostdate'>".$row['date']."</div>".
+		"<div class='pastposttitle'>".$row['title']."</div>".
+		$row['entry'];
 		$postID = $row['postID'];
-		echo "<br><form method='POST' action='home.php'>";
+		echo "<form class='deleteformhome' method='POST' action='home.php'>";
 		echo "<input class='delete' type=hidden name='deletepost' value='$postID'/>";
-		echo "<input type='submit' value='delete post'/>";
-		echo "</form><br></div>";
+		echo "<input type='submit' class='deletebutton' value='delete'/>";
+		echo "</form></div>";
 		$postID = $row['postID'];
 		// print all the comments of that post
 		echo "<div id='postcommentpanel'>";
 		$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID='$postID'");
 		while ($c_row = mysqli_fetch_array($postcomments)){
-			echo "<div class='onecomment'>";
+			echo "<div class='onecommenthome'>";
 			echo "<div class='editingcomment'></div>";
 			echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
 			// delete button
-			echo  "<form class='deleteform' method='POST' action='home.php'>";
+			echo  "<form class='deleteformhome' method='POST' action='home.php'>";
 			$commentID = $c_row['commentID'];
-			echo "<input type='hidden' name='deletecomment' value='$commentID' class='deletecommentID'><input type=submit value='delete comment'>";
-			echo "</form>";
 			// edit button
 			if ($c_row['commenter'] == $user) {
-				echo "<div class='edit'>edit</div>";
+				echo "<button class='edithome' type='button'>edit</button>";
 			}
+			echo "<input type='hidden' name='deletecomment' value='$commentID' class='deletecommentID deletecommenthome'><input class='deletebutton deletebuttonhome' type=submit value='delete'>";
+			echo "</form>";
 			// ********** use consistent string convention
-			echo "</div>"; // for .onecomment
+			echo "</div>"; // for .onecommenthome
 		}
 		echo "</div>";
 		// post comments
@@ -126,30 +150,12 @@
 		or die ('Error editing comment.');
 		header("Location: home.php", 302);
 	}
-?>
-
-<br>
-<div id="friendspanel">friends
-	<ul>
-<?php
-	$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$user'")
-	or die('Failed to get past posts from database.');
-	while ($friends_row = mysqli_fetch_array($friend2_data)){
-		$friend = $friends_row['friend2'];
-		echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
-	}
 	
-	$friend1_data = mysqli_query($dbc, "SELECT friend1 FROM friends WHERE friend2='$user'")
-	or die('Failed to get past posts from database.');
-	while ($friends_row = mysqli_fetch_array($friend1_data)){
-		$friend = $friends_row['friend1'];
-		echo "<form method='GET' action='profile.php'><input type='submit' name='friend' value='$friend'></form>";
-	}
 	mysqli_close($dbc);
 	unset($datetime); // necessary? *****************
 ?>
-	</ul>
-</div>
+</div> <!-- for homemenu -->
+
 <script src="js/jquery-2.0.3.min.js"></script>
 <script src="js/application.js"></script>
 <script>
@@ -183,5 +189,6 @@ $(document).ready(function(){
 });
 
 </script>
+</div> <!-- for home panel-->
 </body>
 </html>
