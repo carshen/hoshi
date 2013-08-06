@@ -40,13 +40,13 @@
 ?>
 	</ul>
 </div>
-<a href="#" id="entry">ADD ENTRY</a> <a href="#" id="posthistory">HISTORY</a> 
+<a href="#">DASHBOARD</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" id="entry">ADD ENTRY</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" id="posthistory">HISTORY</a> 
 <form action="home.php" method="POST" id="postentry">
-	<label>Title</label><br>
+	<label>title</label><br>
 	<input type="text" name="title"><br>
-	<label>Entry</label><br>
+	<label>entry</label><br>
 	<textarea rows="8" cols="80" name="entry" ></textarea><br>
-	<input type="submit" value="Publish" id="submit" name="submit"/>
+	<input class='submitbutton' type="submit" value="publish" id="submit" name="submit"/>
 </form>
 <?php
 
@@ -199,6 +199,9 @@ $(document).ready(function(){
 			$(this).parent().parent().parent().find('.edithome').show();
 		});
 		
+	});
+	$('.commentsunroll').click(function(){
+		$(this).next().next().toggle(250);
 	});
 });
 

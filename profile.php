@@ -26,7 +26,8 @@
 			$friendname = $_GET['friend'];
 
 			// and and delete buttons
-			echo "<div id='addndelete'>";
+			echo "<div id='topmenu'>";
+			echo "<button type='button' class='direction'> <a href='home.php'>home</a> &nbsp;&nbsp;<a href='logout.php'>log out</a></button>";
 			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='+ friend' name='addfriend'></form>";
 			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='- friend' name='deletefriend'></form>";
 			echo "</div>";
@@ -75,7 +76,7 @@
 					while ($c_row = mysqli_fetch_array($postcomments)){
 						echo "<div class='onecomment'>";
 						echo "<div class='comment'>".$c_row['comment']."</div>";
-						echo "<div class='commentdetail'>".$c_row['commenter']." at ".$c_row['date']."</div>";
+						echo "<div class='commentdetail'>"."<a href='profile.php?&friend=".$c_row['commenter']."'>".$c_row['commenter']."</a>"." at ".$c_row['date']."</div>";
 						if ($c_row['commenter'] == $user) {
 							echo "<div class='editingcomment'></div>";
 							echo "<div class='modbuttons'>";
@@ -196,6 +197,9 @@
 				$(this).parent().parent().siblings('.comment').show();
 			});
 			
+		});
+		$('.commentsunroll').click(function(){
+			$(this).siblings('.allcomments').toggle(250);
 		});
 	});
 	</script>

@@ -1,9 +1,8 @@
 /* HOME SCREEN*/
 #postentry {
 	padding: 1.5%;
-	border-style: dotted;
-	border-width: 1px;
 	width: 80%;
+	background: #DFE8F2;
 }
 textarea {
 	resize: none;
@@ -113,7 +112,14 @@ textarea {
 	text-align: center;
 	float: left;
 	}
-
+.direction {
+	margin-left: 1%;
+	margin-right: none;
+	float: right;
+	width: 100%;
+	text-align: right;
+	border: none;
+}
 #profilefriends{
 	float: right;
 	width: 18%;
@@ -126,7 +132,7 @@ textarea {
 	padding-right: 2%;
 }
 
-#addndelete{
+#topmenu{
 	width: 100%;
 	float: left;
 	position: relative;
@@ -138,7 +144,7 @@ textarea {
 	width: 5.5%;
 	float: right;
 	overflow: hidden;
-
+	margin: 0.5%;
 }
 
 .friendbuttons{
