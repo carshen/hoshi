@@ -28,8 +28,16 @@
 			// and and delete buttons
 			echo "<div id='topmenu'>";
 			echo "<button type='button' class='direction'> <a href='home.php'>home</a> &nbsp;&nbsp;<a href='logout.php'>log out</a></button>";
-			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='+ friend' name='addfriend'></form>";
-			echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='- friend' name='deletefriend'></form>";
+				// check if they are friends
+			$findfriendquery = "SELECT * FROM friends WHERE (friend1='$user' AND friend2='$friendname') OR (friend2='$user' AND friend1='$friendname')";
+			$friendexists = mysqli_query($dbc, $findfriendquery)
+			or die ('Error getting friend.');
+			// if they ARE friends
+			if ($friendrow = mysqli_fetch_array($friendexists)){
+				echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='- friend' name='deletefriend'></form>";
+			} else {
+				echo "<form class='addndeletefriend' action='profile.php?friend=$friendname' method='POST'><input class='friendbuttons' type='submit' value='+ friend' name='addfriend'></form>";
+			}
 			echo "</div>";
 			
 			// profile title
@@ -38,20 +46,25 @@
 			echo "<div class='profilepage'>";
 			
 			// add and delete friends
-			if (isset($_POST['addfriend'])){
-				$datetime = new DateTime();
-				$date = $datetime->format('y-m-d h:i:s');
-				
-				$addquery = "INSERT INTO friends (friend1, friend2, since) VALUES ('$user', '$friendname', '$date')";
-				mysqli_query($dbc, $addquery)
-				or die('Error adding friend.');
-				//unset($datetime); // necessary?*********************
+			if (isset($_POST['addfriend']) && ($friendname != $user)){
+				if ($friendrow = mysqli_fetch_array($friendexists)){}
+				else {
+					$datetime = new DateTime();
+					$date = $datetime->format('y-m-d h:i:s');
+					
+					$addquery = "INSERT INTO friends (friend1, friend2, since) VALUES ('$user', '$friendname', '$date')";
+					mysqli_query($dbc, $addquery)
+					or die('Error adding friend.');
+					//unset($datetime); // necessary?*********************
+					header("Location: profile.php?&friend=$friendname", 302);
+				}
 			}
 			if (isset($_POST['deletefriend'])){
 				$user = $_COOKIE['username'];
 				$deletequery = "DELETE FROM friends WHERE friend1='$user' AND friend2='$friendname'";
 				mysqli_query($dbc, $deletequery)
 				or die ('Error deleting friend.');
+				header("Location: profile.php?&friend=$friendname", 302);
 			}
 			
 			// START RENDERING FRIEND'S PROFILE
@@ -184,7 +197,7 @@
 				$(this).parent().siblings('.editingcomment').find('.editform').show();
 			} else {
 				var editcommentID = $(this).siblings('.deleteform').find('.deletecommentID').val();
-				$(this).parent().siblings('.editingcomment').append("<form class='editform' action='profile.php?&friend=" + friendname + "' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='5' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input class='submitedit' name='editaction' type='submit' value='ok'><button type='button' class='cancel'>cancel</button><input class='deletebutton' name='deletecomment' type='submit' value='delete'></form>");
+				$(this).parent().siblings('.editingcomment').append("<form class='editform' action='profile.php?&friend=" + friendname + "' method='POST'>< type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='5' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input class='submitedit' name='editaction' type='submit' value='ok'><button type='button' class='cancel'>cancel</button><input class='deletebutton' name='deletecomment' type='submit' value='delete'></form>");
 				$(this).parent().siblings('.editingcomment').find('.ecomment').val(cmt);
 			}
 			$(this).parent().siblings('.commentdetail').hide();

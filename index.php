@@ -1,6 +1,6 @@
 <html>
 <head>
-<link type="text/css" rel="stylesheet" href="custom.css">
+<link type="text/css" rel="stylesheet" href="css/custom.css">
 </head>
 <body>
 
@@ -24,14 +24,15 @@
 		mysqli_close($dbc);
 	}
 ?>
-<h2>SIGN UP</h2>
-<form action="index.php" method="POST">
+<div id="enterpanel">
+<h2><a href="#" id="slink">SIGN UP</a></h2>
+<form class="enterdetails" id="signin" action="index.php" method="POST">
 	<label>Username</label><br>
 	<input type="text" name="su-name"><br>
 	<label>Password</label><br>
 	<input type="text" name="su-pword"><br>
 	<input type="submit" value="signup" name="signup">
-</form>
+</form><br>
 <?php
 	// query to get the matching username and password from table
 	if (!isset($_COOKIE['username'])){
@@ -57,16 +58,17 @@
 		header("Location: home.php");
 	}
 ?>
-<h2>LOGIN</h2>
-<form action="index.php" method="POST">
+<h2><a href="#" id="llink">LOGIN</a></h2>
+<form class="enterdetails" id="login" action="index.php" method="POST">
 	<label>Username</label><br>
 	<input type="text" name="li-name"><br>
 	<label>Password</label><br>
 	<input type="text" name="li-pword"><br>
 	<input type="submit" value="login">
 </form>
+</div>
 
-<script src="jquery-2.0.3.min.js"></script>
-<script src="application.js"></script>
+<script src="js/jquery-2.0.3.min.js"></script>
+<script src="js/application.js"></script>
 </body>
 </html>

@@ -20,8 +20,7 @@
 ?>
 
 <div id='logout'><a href="logout.php">LOG OUT</a></div></div>
-<div id="friendspanel">friends
-	<ul>
+<div id="friendspanel"><div class='friendlist'>friends
 <?php
 	$friend2_data = mysqli_query($dbc, "SELECT friend2 FROM friends WHERE friend1='$user'")
 	or die('Failed to get past posts from database.');
@@ -38,9 +37,51 @@
 	}
 
 ?>
-	</ul>
 </div>
-<a href="#">DASHBOARD</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" id="entry">ADD ENTRY</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" id="posthistory">HISTORY</a> 
+<div id='friendsearch'>
+
+<form method='POST' action='home.php'>
+<label>find more friends</label><br>
+<input type=text value='search by username' name='desiredname'>
+<input type='submit' value='go' class='submitbutton'>
+</form>
+<?php
+	if (isset($_POST['desiredname'])){
+		$desiredname = $_POST['desiredname'];
+		$friendsearchquery = "SELECT username FROM users WHERE username = '$desiredname'";
+		$search_data = mysqli_query($dbc, $friendsearchquery)
+		or die ('Error finding friends.');
+		
+		if ($foundfriend = mysqli_fetch_array($search_data)){
+			echo "<a href=profile.php?&friend=".$foundfriend['username'].">".$foundfriend['username']."</a>";
+		}
+		else { echo "nobody of that username is on hoshi";}
+	}
+?>
+</div>
+</div>
+
+<a id='dashboardlink' class='homelink' href="#">DASHBOARD</a><a href="#" id="entry" class='homelink'>ADD ENTRY</a><a href="#" id="posthistory" class='homelink'>HISTORY</a> 
+<div id='dashboardpanel'>
+<?php
+	$dashboard_query = "SELECT title, entry, username, date FROM entries, friends WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)".
+	"AND ((friend1='$user' AND friend2=username) OR (friend2='$user' AND friend1=username)) ORDER BY date DESC";
+	$dashboard_data = mysqli_query($dbc, $dashboard_query)
+	or die('Error selecting dashboard entries.');
+	
+	while ($dashboard_row = mysqli_fetch_array($dashboard_data)){
+		echo "<div class='dash_entry'>";
+		echo "<div class='pastposttitlehome'>"."<a class='homeposttitle' href='profile.php?friend=".$dashboard_row['username']."'>".
+		$dashboard_row['title']." &rarr;</a></div><br>".
+		$dashboard_row['entry']."<br>".
+		"<div class='pastpostdate'>&mdash; ".
+		"<a href='profile.php?friend=".$dashboard_row['username']."'>".$dashboard_row['username']."</a> at ".
+		$dashboard_row['date']."</div><br>";
+		echo "</div>"; // for dash_entry
+	}
+?>
+</div>
+
 <form action="home.php" method="POST" id="postentry">
 	<label>title</label><br>
 	<input type="text" name="title"><br>
