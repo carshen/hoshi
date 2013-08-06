@@ -132,7 +132,7 @@
 	}
 	
 	// delete a comment
-	if (isset($_POST['deletecomment'])){
+	if (isset($_POST['deletecomment']) &&!isset($_POST['editcommentID'])){
 		$deletecomment = $_POST['deletecomment'];
 		$deletecommentquery = "DELETE FROM comments WHERE commentID= '$deletecomment'";
 		mysqli_query($dbc, $deletecommentquery)
@@ -143,13 +143,24 @@
 	
 	//edit a comment
 	if (isset($_POST['editcommentID'])){
-		$editcommentID = $_POST['editcommentID'];
-		echo "$editcommentID";
-		$comment = mysqli_real_escape_string($dbc, $_POST['cmt']);
-		$editquery = "UPDATE comments SET comment='$comment' WHERE commentID = '$editcommentID'";
-		mysqli_query($dbc, $editquery)
-		or die ('Error editing comment.');
-		header("Location: home.php", 302);
+		echo "set";
+		if (!isset($_POST['deletecommentaction'])){
+			echo "updating";
+			$editcommentID = $_POST['editcommentID'];
+			$comment = mysqli_real_escape_string($dbc, $_POST['cmt']);
+			$editquery = "UPDATE comments SET comment='$comment' WHERE commentID = '$editcommentID'";
+			mysqli_query($dbc, $editquery)
+			or die ('Error editing comment.');
+			header("Location: home.php", 302);
+		}
+		else {
+			echo "deleting";
+			$deletecommentID = $_POST['editcommentID'];
+			$deletecommentquery = "DELETE FROM comments WHERE commentID = '$deletecommentID'";
+			mysqli_query($dbc, $deletecommentquery)
+			or die ('Error editing comment.');
+			header("Location: home.php", 302);
+		}
 	}
 	
 	mysqli_close($dbc);
@@ -168,8 +179,8 @@ $(document).ready(function(){
 		if ($(this).parent().parent().siblings('.editingcomment').find('.ecomment').length){
 			$(this).parent().parent().find('.editingcomment').show();
 		} else {
-			var editcommentID = $(this).parent().siblings('.deleteformhome').find('.deletecommentID').val();
-			$(this).parent().siblings('.editingcomment').append("<form action='home.php' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='10' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input class='edithome' type='submit' value='ok'><button type='button' class='cancel'>cancel</button><input type='submit' class='deletebutton' value='delete'/></form>");
+			var editcommentID = $(this).parent().parent().find('.deleteformhome').find('.deletecommentID').val();
+			$(this).parent().siblings('.editingcomment').append("<form action='home.php' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='10' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input class='edithome' type='submit' value='ok'><button type='button' class='cancel'>cancel</button><input type='submit' name='deletecommentaction' class='deletebutton' value='delete'/></form>");
 			$(this).parent().siblings('.editingcomment').find('.ecomment').val(cmt);
 		}
 		
@@ -178,6 +189,7 @@ $(document).ready(function(){
 		$(this).parent().parent().find('.deleteformhome').hide();
 		$('.cancel').click(function(){
 			$(this).parent().parent().siblings('.comment').show();
+			$(this).parent().parent().siblings('.commentdetail').show();
 			$(this).parent().hide();
 			//$(this).siblings('.editingcomment').hide();
 			$(this).hide();

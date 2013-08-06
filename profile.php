@@ -144,7 +144,7 @@
 			if (isset($_POST['editcommentID'])){
 				if (!isset($_POST['deletecomment'])){
 					$editcommentID = $_POST['editcommentID'];
-					echo "$editcommentID";
+					//echo "$editcommentID";
 					$comment = mysqli_real_escape_string($dbc, $_POST['cmt']);
 					$editquery = "UPDATE comments SET comment='$comment' WHERE commentID = '$editcommentID'";
 					mysqli_query($dbc, $editquery)
