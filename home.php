@@ -52,8 +52,8 @@
 
 	// add a post
 	if (isset($_POST['title'])){ 
-		$title = $_POST['title']; 
-		$entry = $_POST['entry'];
+		$title = mysqli_real_escape_string($dbc, $_POST['title']); 
+		$entry = mysqli_real_escape_string($dbc, $_POST['entry']);
 		$datetime = new DateTime();
 		$date = $datetime->format('y-m-d h:i:s');
 
@@ -89,8 +89,8 @@
 		echo "</form></div>";
 		$postID = $row['postID'];
 		// print all the comments of that post
-		echo "comments";
-		echo "<div id='postcommentpanel'>";
+		echo "<div class='commentsunroll'>show comments</div><br>";
+		echo "<div class='allcomments'>";
 		$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID='$postID'");
 		while ($c_row = mysqli_fetch_array($postcomments)){
 			echo "<div class='onecommenthome'>";
@@ -108,11 +108,11 @@
 			// ********** use consistent string convention
 			echo "</div>"; // for .onecommenthome
 		}
-		echo "</div>";
 		// post comments
-		echo "<form action='home.php' method='POST'><label>comment</label><br>" .
+		echo "<form action='home.php' method='POST'><br><label>leave a comment</label><br>" .
 		"<textarea rows='8' cols='50' name='comment'></textarea><input type='hidden' name='commenting' value='$postID'>".
-		"<br><input type='submit' value='comment'></form>";
+		"<br><input class='submitbutton' type='submit' value='submit'></form>";
+		echo "</div>";
 	}
 	echo "</div>";
 	// END DISPLAY POSTS

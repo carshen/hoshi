@@ -40,15 +40,11 @@ textarea {
 	padding-bottom: 3%;
 }
 
-#postcommentpanel{
-	
-}
 
 #history{
 	padding: 1.5%;
-	border-style: dotted;
-	border-width: 1px;
 	width: 80%;
+	background: #D5DCE6;
 }
 
 #friendspanel{
@@ -206,7 +202,10 @@ textarea {
 	background: #8BAFCC;
 	border: none;
 }
-
+.submitbutton{
+	background: #8BAFCC;
+	border: none;
+}
 .deleteform{
 	width: 5%;
 	height: 0%;

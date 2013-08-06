@@ -13,4 +13,21 @@ $(document).ready(function(){
 		$('#deletenotice').remove();
 		$('#postentry').hide();
 	});
+	
+	// enter panel -- refactor duplicate code later
+	$('#signin').hide();
+	$('#slink').click(function(){
+		$('#signin').toggle(250);
+		$('#login').hide();
+	});
+	$('#login').hide();
+	$('#llink').click(function(){
+		$('#login').toggle(250);
+		$('#signin').hide();
+	});
+	$('.allcomments').hide();
+	$('.commentsunroll').click(function(){
+		//$(this).siblings('.allcomments').toggle(250);
+		$(this).next().next().toggle(250);
+	});
 });
