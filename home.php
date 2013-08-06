@@ -89,12 +89,13 @@
 		echo "</form></div>";
 		$postID = $row['postID'];
 		// print all the comments of that post
+		echo "comments";
 		echo "<div id='postcommentpanel'>";
 		$postcomments = mysqli_query($dbc, "SELECT commentID, comment, commenter, date FROM comments WHERE postID='$postID'");
 		while ($c_row = mysqli_fetch_array($postcomments)){
 			echo "<div class='onecommenthome'>";
 			echo "<div class='editingcomment'></div>";
-			echo "<div class='comment'>".$c_row['comment']."</div>"."<br>".$c_row['commenter']." ".$c_row['date']."<br>";
+			echo "<div class='comment'>".$c_row['comment']."</div>"."<br><div class='commentdetail'>".$c_row['commenter']." ".$c_row['date']."</div>";
 			// delete button
 			echo  "<form class='deleteformhome' method='POST' action='home.php'>";
 			$commentID = $c_row['commentID'];
@@ -161,28 +162,29 @@
 <script>
 $(document).ready(function(){
 		// CLICKING EDIT AND CANCELLING EDIT
-	$('.edit').click(function(){
-		var cmt = $(this).siblings(".comment").text();
-		$(this).siblings(".comment").hide();
-		if ($(this).siblings('.editingcomment').find('.ecomment').length){
-			$(this).siblings('.editingcomment').show();
+	$('.edithome').click(function(){
+		var cmt = $(this).parent().siblings(".comment").text();
+		$(this).parent().siblings(".comment").hide();
+		if ($(this).parent().parent().siblings('.editingcomment').find('.ecomment').length){
+			$(this).parent().parent().find('.editingcomment').show();
 		} else {
-			var editcommentID = $(this).siblings('.deleteform').find('.deletecommentID').val();
-			$(this).siblings('.editingcomment').append("<form action='home.php' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><input class='ecomment' name='cmt' value='' type='text'><input type='submit' value='edit'></form>");
-			$(this).siblings('.editingcomment').find('.ecomment').val(cmt);
+			var editcommentID = $(this).parent().siblings('.deleteformhome').find('.deletecommentID').val();
+			$(this).parent().siblings('.editingcomment').append("<form action='home.php' method='POST'><input type='hidden' name='editcommentID' value='" + editcommentID + "'><textarea rows='10' cols='100' class='ecomment' name='cmt' value=''></textarea><br><input class='edithome' type='submit' value='ok'><button type='button' class='cancel'>cancel</button><input type='submit' class='deletebutton' value='delete'/></form>");
+			$(this).parent().siblings('.editingcomment').find('.ecomment').val(cmt);
 		}
 		
-		if ($(this).siblings('.cancel').length){
-			$(this).siblings('.cancel').show();
-		} else {
-			$(this).parent().append("<div class='cancel'>cancel</div>");
-		}
 		$(this).hide();
+		$(this).parent().siblings('.commentdetail').hide();
+		$(this).parent().parent().find('.deleteformhome').hide();
 		$('.cancel').click(function(){
-			$(this).siblings('.comment').show();
-			$(this).siblings('.editingcomment').hide();
+			$(this).parent().parent().siblings('.comment').show();
+			$(this).parent().hide();
+			//$(this).siblings('.editingcomment').hide();
 			$(this).hide();
-			$(this).siblings('.edit').show();
+			//$(this).parent().parent().find('.deleteformhome').show();
+			// $(this).parent().css("background", "yellow"); -- .editingcomment
+			$(this).parent().parent().parent().find('.deleteformhome').show();
+			$(this).parent().parent().parent().find('.edithome').show();
 		});
 		
 	});

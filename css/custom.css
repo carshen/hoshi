@@ -32,7 +32,6 @@ textarea {
 	background: #8BAFCC;
 	text-align: center;
 	border: none;
-	float: left;
 }
 .pastposthome {
 	padding-left: 3%;
@@ -42,8 +41,7 @@ textarea {
 }
 
 #postcommentpanel{
-	border-style: dotted;
-	border-width: 1px;
+	
 }
 
 #history{
@@ -76,7 +74,7 @@ textarea {
 }
 
 .onecommenthome{
-	padding-bottom: 2%;
+	padding-bottom: 1%;
 	padding-left: 3%;
 	padding-right: 3%;
 	padding-top: 2%;
